@@ -14,7 +14,7 @@ namespace AdventOfCode2022
 
 		private static HttpClient Client => client != null ? client : CreateClient();
 
-		public static IEnumerable<string> GetTestData(string day)
+		public static string GetTestData(string day)
 		{
 			var fileName = $"Input{day}.txt";
 			string testData;
@@ -33,7 +33,7 @@ namespace AdventOfCode2022
 				throw new Exception($"Failed to retrieve test data for problem {day}");
 			}
 
-			return testData.Split('\n');
+			return testData;
 		}
 
 		private static HttpClient CreateClient()

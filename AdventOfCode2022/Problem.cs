@@ -1,13 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AdventOfCode2022
 {
-	public abstract class Problem
+	public abstract class Problem<T>
 	{
 		private int AnswersGiven = 0;
-		public abstract void Solve(IEnumerable<string> testData);
+
+		protected virtual EmptyStringBehavior EmptyStringBehavior => EmptyStringBehavior.Reject;
+		public abstract void Solve(IEnumerable<T> testData);
+
+		public virtual IEnumerable<T> ParseData(string testData)
+		{
+			return testData.Split('\n')
+				.Where(x => this.EmptyStringBehavior == EmptyStringBehavior.Keep || !string.IsNullOrEmpty(x))
+				.Select(ParseDataLine);
+		}
+
+		protected abstract T ParseDataLine(string line);
 
 		protected void PrintResult(string result)
 		{
@@ -28,5 +40,11 @@ namespace AdventOfCode2022
 		{
 			this.PrintResult(result.ToString());
 		}
+	}
+
+	public enum EmptyStringBehavior
+	{
+		Reject,
+		Keep
 	}
 }
