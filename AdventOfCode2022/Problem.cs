@@ -36,9 +36,14 @@ namespace AdventOfCode2022
 			this.AnswersGiven++;
 		}
 
-		protected void PrintResult(int result)
+		protected void PrintResult(object result)
 		{
 			this.PrintResult(result.ToString());
+		}
+
+		protected void Print(string s)
+		{
+			Console.WriteLine(s);
 		}
 	}
 

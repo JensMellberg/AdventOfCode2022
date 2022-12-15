@@ -10,9 +10,9 @@ namespace AdventOfCode2022
 {
 	public class TestDataReader
 	{
-		private static HttpClient client;
+		private static readonly HttpClient client;
 
-		private static HttpClient Client => client != null ? client : CreateClient();
+		private static HttpClient Client => client ?? CreateClient();
 
 		public static string GetTestData(string day)
 		{
@@ -39,12 +39,14 @@ namespace AdventOfCode2022
 		private static HttpClient CreateClient()
 		{
 			Uri uri = new Uri("https://adventofcode.com");
-			var handler = new HttpClientHandler();
-			handler.CookieContainer = new CookieContainer();
+			var handler = new HttpClientHandler
+			{
+				CookieContainer = new CookieContainer()
+			};
 
 			HttpClient client = new HttpClient(handler);
 			var sessionKey = "53616c7465645f5f0cc303b36763213e606642dba3188a05b953f5ce923ff6bab5d1ec897e5569030b8372f00dcfe8641246abd245b76eb9e206c945cfa73ed1";
-			handler.CookieContainer.Add(uri, new Cookie("session", sessionKey)); // Adding a Cookie
+			handler.CookieContainer.Add(uri, new Cookie("session", sessionKey));
 			return client;
 		}
     }
