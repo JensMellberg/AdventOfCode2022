@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 
 namespace AdventOfCode2022
 {
@@ -16,6 +11,11 @@ namespace AdventOfCode2022
 			{
 				action(item);
 			}
+		}
+
+		public static void Print<T>(this IEnumerable<T> enumerable)
+		{
+			Console.WriteLine(string.Join(',', enumerable));
 		}
     }
 }

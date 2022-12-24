@@ -11,34 +11,11 @@ namespace AdventOfCode2022
 	{
 		public override void Solve(IEnumerable<BluePrint> testData)
 		{
-			//this.PrintResult(RunBluePrints(testData.ToList(), 24).Sum());
-			//this.PrintResult(RunBluePrints(testData.Take(3).ToList(), 32).Aggregate((a, b) => a * b));
-			//this.PrintResult(testData.Select(x => ResultWithBluePrint(x, 24)).Sum());
-			this.PrintResult(testData.Take(3).Select(x => ResultWithBluePrint(x, 32)).Aggregate((a, b) => a * b));
+			this.PrintResult(testData.Select(x => ResultWithBluePrint(x, 24, x.Id)).Sum());
+			this.PrintResult(testData.Take(3).Select(x => ResultWithBluePrint(x, 32, 1)).Aggregate((a, b) => a * b));
 		}
 
-		public IEnumerable<int> RunBluePrints(IList<BluePrint> bluePrints, int totalTime)
-		{
-			var goal = bluePrints.Count;
-			var results = new List<int>();
-			Parallel.For(0, goal, i => results.Add(ResultWithBluePrint(bluePrints[i], totalTime)));
-			/*foreach (var bluePrint in bluePrints)
-			{
-				new Thread(() =>
-				{
-					results.Add(ResultWithBluePrint(bluePrint, totalTime));
-				}).Start();
-			}*/
-
-			while (results.Count < goal)
-			{
-				Thread.Sleep(2000);
-			}
-
-			return results;
-		}
-
-		public static int ResultWithBluePrint(BluePrint bluePrint, int totalTime)
+		public static int ResultWithBluePrint(BluePrint bluePrint, int totalTime, int multiplier)
 		{
 			var robots = new List<Robot>
 			{
@@ -53,43 +30,20 @@ namespace AdventOfCode2022
 				{ ResourceType.Geode, 0 }
 			};
 
-			var bestResult = BestResult(bluePrint, robots, new Resources { ResourceCounts = resourceCounts }, totalTime, new List<ResourceType>(), null, new HashSet<string>(), new Dictionary<int, int>());
-			return bluePrint.Id * bestResult;
+			var bestResult = BestResult(bluePrint, robots, new Resources { ResourceCounts = resourceCounts }, totalTime, new List<ResourceType>(), null);
+			Console.WriteLine(bluePrint.Id + ": " + bestResult);
+			return multiplier * bestResult;
 		}
 
-		public static int BestResult(BluePrint bluePrint, List<Robot> robots, Resources resources, int time, int timeSpent, List<ResourceType> pausedTypes, Robot newRobot, HashSet<string> visited, IDictionary<int, int> BestForTime)
+		public static int BestResult(BluePrint bluePrint, List<Robot> robots, Resources resources, int time, List<ResourceType> pausedTypes, Robot newRobot)
 		{
-			time-=timeSpent;
-			/*var robotKey = string.Join(" ", robots.OrderBy(x => x.RobotType).Select(x => (int)x.RobotType));
-			var resourceKey = string.Join(',', resources.ResourceCounts.Values);
-			var key = robotKey + "|" + resourceKey + "|" + time;
-			if (visited.Contains(key))
-			{
-				return 0;
-			}
-
-			visited.Add(key);*/
+			time--;
 			var newResourceCounts = new Dictionary<ResourceType, int>(resources.ResourceCounts);
-			robots.ForEach(x => newResourceCounts[x.RobotType]+= timeSpent);
+			robots.ForEach(x => newResourceCounts[x.RobotType]++);
+			var diffDict = resources.ResourceCounts.Keys.ToDictionary(x => x, x => newResourceCounts[x] - resources.ResourceCounts[x]);
+
 			var newResources = new Resources { ResourceCounts = newResourceCounts };
 			var hasBoughtMandatory = false;
-			if (time == 0)
-			{
-				return newResources.ResourceCounts[ResourceType.Geode];
-			}
-
-			if (!BestForTime.ContainsKey(time))
-			{
-				BestForTime.Add(time, 0);
-			}
-
-			if (BestForTime[time] > newResources.ResourceCounts[ResourceType.Geode] + 3)
-			{
-				return BestForTime[time];
-			}
-
-			BestForTime[time] = Math.Max(BestForTime[time], newResources.ResourceCounts[ResourceType.Geode]);
-
 			var newList = new List<Robot>(robots);
 			if (newRobot != null)
 			{
@@ -98,14 +52,23 @@ namespace AdventOfCode2022
 
 			var result = 0;
 			var pausedTypesCopy = new List<ResourceType>(pausedTypes);
+			foreach (var type in bluePrint.MaxResourceDiffs.Keys.Where(x => !pausedTypesCopy.Contains(x)))
+			{
+				if (diffDict[type] >= bluePrint.MaxResourceDiffs[type])
+				{
+					pausedTypesCopy.Add(type);
+				}
+			}
+
 			foreach (var kv in bluePrint.RobotCosts)
 			{
 				if (!pausedTypesCopy.Contains(kv.Key) && kv.Value.All(x => newResources.ResourceCounts[x.RobotType] >= x.Cost))
 				{
-					result = Math.Max(result, BestResult(bluePrint, newList, newResources.Copy(kv.Value), time, new List<ResourceType>()/*pausedTypesCopy.Where(x => !pausedTypes.Contains(x)).ToList()*/, new Robot { RobotType = kv.Key }, visited, BestForTime));
-					if (kv.Key == ResourceType.Geode || kv.Key == ResourceType.Obsidian)
+					result = Math.Max(result, BestResult(bluePrint, newList, newResources.Copy(kv.Value), time, new List<ResourceType>(), new Robot { RobotType = kv.Key }));
+					if (kv.Key == ResourceType.Geode)
 					{
 						hasBoughtMandatory = true;
+						break;
 					}
 					else
 					{
@@ -116,7 +79,7 @@ namespace AdventOfCode2022
 
 			if (!hasBoughtMandatory)
 			{
-				result = Math.Max(result, BestResult(bluePrint, newList, newResources, time, pausedTypesCopy, null, visited, BestForTime));
+				result = Math.Max(result, BestResult(bluePrint, newList, newResources, time, pausedTypesCopy, null));
 			}
 
 			return result;
@@ -147,7 +110,23 @@ namespace AdventOfCode2022
 			});
 			this.RobotCosts.Add(ResourceType.Ore, new[] { new RobotCost { RobotType = ResourceType.Ore, Cost = oreCost } });
 			this.RobotCosts.Add(ResourceType.Clay, new[] { new RobotCost { RobotType = ResourceType.Ore, Cost = clayCost } });
+
+			foreach (var k in RobotCosts.Keys)
+			{
+				MaxResourceDiffs.Add(k, 0);
+			}
+			MaxResourceDiffs.Remove(ResourceType.Geode);
+			var types = new[] { ResourceType.Ore, ResourceType.Clay, ResourceType.Obsidian };
+			foreach (var type in types)
+			{
+				foreach (var cost in RobotCosts.SelectMany(x => x.Value).Where(x => x.RobotType == type))
+				{
+					MaxResourceDiffs[type] = Math.Max(MaxResourceDiffs[type], cost.Cost);
+				}
+			}
 		}
+
+		public Dictionary<ResourceType, int> MaxResourceDiffs = new Dictionary<ResourceType, int>();
 
 		public int Id { get; set; }
 
@@ -189,5 +168,4 @@ namespace AdventOfCode2022
 		Obsidian,
 		Geode
 	}
-
 }

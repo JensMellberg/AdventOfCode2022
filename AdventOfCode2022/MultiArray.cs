@@ -57,6 +57,8 @@ namespace AdventOfCode2022
 			}
 		}
 
+		public bool IsInBounds(int x, int y) => x >= 0 && x < this.ColumnCount && y >= 0 && y < this.RowCount;
+
 		public IEnumerable<T> GetColumn(int column)
 		{
 			for (var i = 0; i < this.RowCount; i++)
@@ -130,7 +132,8 @@ namespace AdventOfCode2022
 
 			return new Matrix<F>(matrix);
 		}
-		public static Matrix<F> FromTestInput<F>(IEnumerable<string> testInput)
+
+		public static Matrix<F> FromTestInput<F>(IEnumerable<string> testInput, Func<char, object> Converter)
 		{
 			var list = testInput.ToList();
 			var matrix = new F[list[0].Length, list.Count];
@@ -138,11 +141,15 @@ namespace AdventOfCode2022
 			{
 				for (var x = 0; x < list[0].Length; x++)
 				{
-					matrix[x, i] = (F)ConvertToType(list[i][x]);
+					matrix[x, i] = (F)Converter(list[i][x]);
 				}
 			}
 
 			return new Matrix<F>(matrix);
+		}
+		public static Matrix<F> FromTestInput<F>(IEnumerable<string> testInput)
+		{
+			return FromTestInput<F>(testInput, ConvertToType);
 
 			object ConvertToType(char s)
 			{

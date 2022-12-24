@@ -17,5 +17,7 @@ namespace AdventOfCode2022
 			instance.ParseFromLine(line);
 			return instance;
 		}
+
+		public static bool IsNumber(char s) => s >= '0' && s <= '9';
     }
 }

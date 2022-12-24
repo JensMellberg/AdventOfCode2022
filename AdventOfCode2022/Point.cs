@@ -31,5 +31,13 @@ namespace AdventOfCode2022
 		}
 
 		public int ManhattanDistance(Point other) => this.XDistance(other, true) + this.YDistance(other, true);
+
+		public override string ToString() => X + "," + Y;
+
+		public static Point FromString(string line)
+		{
+			var tokens = line.Split(',');
+			return new Point(int.Parse(tokens[0]), int.Parse(tokens[1]));
+		}
 	}
 }

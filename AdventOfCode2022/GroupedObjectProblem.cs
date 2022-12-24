@@ -28,8 +28,6 @@ namespace AdventOfCode2022
 					currentGroup.CreateChild(line);
 				}
 			}
-
-			//yield return currentGroup;
 		}
 
 		protected override T ParseDataLine(string line)

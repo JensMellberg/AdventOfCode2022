@@ -14,9 +14,9 @@ namespace AdventOfCode2022
 
 		private static HttpClient Client => client ?? CreateClient();
 
-		public static string GetTestData(string day)
+		public static string GetTestData(string day, bool isTest)
 		{
-			var fileName = $"Input{day}.txt";
+			var fileName = isTest ? $"Test{day}.txt" : $"Input{day}.txt";
 			string testData;
 			if (!File.Exists(fileName))
 			{

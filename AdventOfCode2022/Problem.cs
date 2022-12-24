@@ -12,6 +12,17 @@ namespace AdventOfCode2022
 		protected virtual EmptyStringBehavior EmptyStringBehavior => EmptyStringBehavior.Reject;
 		public abstract void Solve(IEnumerable<T> testData);
 
+		private bool supressPrints;
+
+		private List<string> Answers = new List<string>();
+
+		public void SetBenchmarkRun()
+		{
+			this.supressPrints = true;
+		}
+
+		public List<string> GetResults() => this.Answers;
+
 		public virtual IEnumerable<T> ParseData(string testData)
 		{
 			return testData.Split('\n')
@@ -25,14 +36,15 @@ namespace AdventOfCode2022
 		{
 			if (AnswersGiven == 0)
 			{
-				Console.Write("First answer: ");
+				this.PrintWithoutLineBreak("First answer: ");
 			}
 			else if (AnswersGiven == 1)
 			{
-				Console.Write("Second answer: ");
+				this.PrintWithoutLineBreak("Second answer: ");
 			}
 
-			Console.WriteLine(result);
+			this.Print(result);
+			this.Answers.Add(result);
 			this.AnswersGiven++;
 		}
 
@@ -43,7 +55,17 @@ namespace AdventOfCode2022
 
 		protected void Print(string s)
 		{
-			Console.WriteLine(s);
+			this.PrintWithoutLineBreak(s + "\n");
+		}
+
+		protected void PrintWithoutLineBreak(string s)
+		{
+			if (this.supressPrints)
+			{
+				return;
+			}
+
+			Console.Write(s);
 		}
 	}
 
