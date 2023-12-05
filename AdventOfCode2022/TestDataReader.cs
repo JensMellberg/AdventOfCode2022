@@ -16,11 +16,11 @@ namespace AdventOfCode2022
 
 		public static string GetTestData(string day, bool isTest)
 		{
-			var fileName = isTest ? $"Test{day}.txt" : $"Input{day}.txt";
+			var fileName = $"{Program.CurrentYearNumber}/" + (isTest ? $"Test{day}.txt" : $"Input{day}.txt");
 			string testData;
 			if (!File.Exists(fileName))
 			{
-				testData = Client.GetStringAsync($"https://adventofcode.com/2022/day/{day}/input").Result;
+				testData = Client.GetStringAsync($"https://adventofcode.com/{Program.CurrentYearNumber}/day/{day}/input").Result;
 				File.WriteAllText(fileName, testData);
 			}
 			else
@@ -45,7 +45,7 @@ namespace AdventOfCode2022
 			};
 
 			HttpClient client = new HttpClient(handler);
-			var sessionKey = "53616c7465645f5f0cc303b36763213e606642dba3188a05b953f5ce923ff6bab5d1ec897e5569030b8372f00dcfe8641246abd245b76eb9e206c945cfa73ed1";
+			var sessionKey = "53616c7465645f5ffbd475000cc30e798a0e4aef0766e5bdb992c2f8e970179a2f17048a2e395e5d0716c53017fcefd60269fccaa84f9e7d4405840c8f438773";
 			handler.CookieContainer.Add(uri, new Cookie("session", sessionKey));
 			return client;
 		}

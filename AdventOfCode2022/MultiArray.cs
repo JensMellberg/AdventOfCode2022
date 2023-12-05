@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 
 namespace AdventOfCode2022
 {
@@ -56,6 +51,49 @@ namespace AdventOfCode2022
 				yield return this.Array[i, row];
 			}
 		}
+
+		public IEnumerable<(int x, int y)> GetAdjacentCoordinates(int x, int y)
+		{
+            if (this.IsInBounds(x - 1, y))
+            {
+                yield return (x - 1, y);
+            }
+
+            if (this.IsInBounds(x + 1, y))
+            {
+                yield return (x + 1, y);
+            }
+
+            if (this.IsInBounds(x - 1, y - 1))
+            {
+                yield return (x - 1, y - 1);
+            }
+
+            if (this.IsInBounds(x - 1, y + 1))
+            {
+                yield return (x - 1, y + 1);
+            }
+
+            if (this.IsInBounds(x, y + 1))
+            {
+                yield return (x, y + 1);
+            }
+
+            if (this.IsInBounds(x, y - 1))
+            {
+                yield return (x, y - 1);
+            }
+
+            if (this.IsInBounds(x + 1, y + 1))
+            {
+                yield return (x + 1, y + 1);
+            }
+
+            if (this.IsInBounds(x + 1, y - 1))
+            {
+                yield return (x + 1, y - 1);
+            }
+        }
 
 		public bool IsInBounds(int x, int y) => x >= 0 && x < this.ColumnCount && y >= 0 && y < this.RowCount;
 

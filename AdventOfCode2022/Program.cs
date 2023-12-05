@@ -6,12 +6,17 @@ namespace AdventOfCode2022
 {
 	class Program
 	{
-		static void Main(string[] args)
+        public static string CurrentYear => CurrentYearNumber == "2023" ? "TwentyThree" : "TwentyTwo";
+
+        public static string CurrentYearNumber = "2023";
+
+        static void Main(string[] args)
 		{
             Console.WriteLine("Type the specific day you want to solve the problem for or an empty line for the latest problem.");
             while (true)
 			{
                 var command = Console.ReadLine();
+                var tokens = command.Split(" ");
                 if (string.IsNullOrEmpty(command))
                 {
                     SolveLastProblem();
@@ -20,10 +25,13 @@ namespace AdventOfCode2022
 				{
                     BenchMark();
 				}
+                else if (tokens[0].Equals("-year", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine($"Year set to {tokens[1]}");
+                    CurrentYearNumber = tokens[1];
+                }
                 else
 				{
-                    var tokens = command.Split(" ");
-
                     if (!SolveProblem(tokens[0], tokens.Length > 1 && tokens[1].Equals("-test", StringComparison.OrdinalIgnoreCase)))
 					{
                         Console.WriteLine($"Could not find problem: {command}");
@@ -55,7 +63,7 @@ namespace AdventOfCode2022
 
         static bool GetProblemClass(string problemNumber, out Type problem, out object instance)
 		{
-            var classString = "AdventOfCode2022.Problem" + problemNumber;
+            var classString = $"AdventOfCode2022.{CurrentYear}.Problem" + problemNumber;
             problem = Type.GetType(classString);
             instance = problem == null ? null : Activator.CreateInstance(problem);
             return problem != null;

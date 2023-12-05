@@ -10,7 +10,10 @@ namespace AdventOfCode2022
 		private int AnswersGiven = 0;
 
 		protected virtual EmptyStringBehavior EmptyStringBehavior => EmptyStringBehavior.Reject;
-		public abstract void Solve(IEnumerable<T> testData);
+
+        protected virtual TabBehavior TabBehavior => TabBehavior.Keep;
+
+        public abstract void Solve(IEnumerable<T> testData);
 
 		private bool supressPrints;
 
@@ -26,7 +29,8 @@ namespace AdventOfCode2022
 		public virtual IEnumerable<T> ParseData(string testData)
 		{
 			return testData.Split('\n')
-				.Where(x => this.EmptyStringBehavior == EmptyStringBehavior.Keep || !string.IsNullOrEmpty(x))
+                .Select(x => this.TabBehavior == TabBehavior.Reject ? x.Replace("\r", "") : x)
+                .Where(x => this.EmptyStringBehavior == EmptyStringBehavior.Keep || !string.IsNullOrEmpty(x))
 				.Select(ParseDataLine);
 		}
 
@@ -74,4 +78,10 @@ namespace AdventOfCode2022
 		Reject,
 		Keep
 	}
+
+    public enum TabBehavior
+    {
+        Reject,
+        Keep
+    }
 }
