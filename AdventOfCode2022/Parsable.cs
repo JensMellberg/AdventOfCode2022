@@ -7,7 +7,7 @@ namespace AdventOfCode2022
 {
 	public abstract class Parsable
 	{
-		protected string originalLine;
+		public string originalLine;
 		public Parsable() { }
 
 		public virtual void ParseFromLine(string line)
