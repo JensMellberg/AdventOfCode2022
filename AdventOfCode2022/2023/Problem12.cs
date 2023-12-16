@@ -1,102 +1,166 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdventOfCode2022.TwentyTwo;
 
 namespace AdventOfCode2022.TwentyThree
 {
-    public class Problem11 : StringProblem
+    public class Problem12 : ObjectProblem<SpringRow>
     {
         protected override TabBehavior TabBehavior => TabBehavior.Reject;
-        private const int ExpandedSizePart1 = 2;
-        private const int ExpandedSizePart2 = 1000000;
-        public override void Solve(IEnumerable<string> testData)
+
+        public static IDictionary<(string, string), long> memory = new Dictionary<(string, string), long>();
+        public override void Solve(IEnumerable<SpringRow> testData)
         {
-            var matrix = Matrix.FromTestInput<char>(testData);
-            var expandedRows = new HashSet<int>();
-            var expandedCols = new HashSet<int>();
-            var galaxies = new List<(int x, int y)>();
-            for (var i = 0; i < matrix.RowCount; i++)
+            testData.ForEach(x => this.Print(x.originalLine + "  :" + x.Combinations()));
+            this.PrintResult(testData.Sum(x => x.Combinations()));
+            var newData = testData.Select(x => x.Unfold());
+
+            long total = 0;
+            foreach (var data in newData)
             {
-                var row = matrix.GetRow(i).ToList();
-                var hasGalaxy = false;
-                for (var pos = 0; pos < row.Count; pos++)
+                memory.Clear();
+                var combs = data.Combinations();
+                total += combs;
+            }
+
+            this.PrintResult(total);
+        }
+    }
+
+    public class SpringRow : Parsable
+    {
+        public SpringRow() { }
+
+        public SpringRow(string row, int[] configs, int currentCount, bool isFinished)
+        {
+            this.row = row;
+            this.configs = configs;
+            this.currentCount = currentCount;
+            this.isFinished = isFinished;
+            this.initialFinished = isFinished;
+        }
+
+        string row;
+        int[] configs;
+        int currentCount = 0;
+        bool isFinished = false;
+        bool initialFinished = false;
+
+        public SpringRow Unfold()
+        {
+            var newRow = this.row + "?" + this.row + "?" + this.row + "?" + this.row + "?" + this.row;
+            var newConfig = this.configs.Concat(this.configs).Concat(this.configs).Concat(this.configs).Concat(this.configs).ToArray();
+            return new SpringRow(newRow, newConfig, 0, false);
+        }
+
+        public override void ParseFromLine(string line)
+        {
+            var tokens = line.Split(' ');
+            this.row = tokens[0];
+            this.configs = tokens[1].Split(',').Select(int.Parse).ToArray();
+            base.ParseFromLine(line);
+        }
+
+        private string Stringify() => string.Join(",", this.configs) + "#" + this.currentCount + "|" + this.initialFinished;
+
+        public long Combinations()
+        {
+            var config = configs.Length == 0 ? -1 : configs[0];
+
+            if (this.row.Length == 0)
+            {
+                if (isFinished && currentCount > 0)
                 {
-                    var isGalaxy = row[pos] == '#';
-                    if (isGalaxy)
+                    return 0;
+                }
+
+                if (!isFinished && currentCount == config && configs.Length == 1)
+                {
+                    this.isFinished = true;
+                }
+
+                if (currentCount > 0 && currentCount < config)
+                {
+                    return 0;
+                }
+
+                var result = this.isFinished ? 1 : 0;
+                return result;
+            }
+
+            var configsLeft = this.Stringify();
+
+            if (Problem12.memory.TryGetValue((this.row, configsLeft), out var value5))
+            {
+                return value5;
+            }
+
+            var current = this.row[0];
+            if (current == '#')
+            {
+                if (isFinished || currentCount >= config)
+                {
+                    return 0;
+                }
+
+                var result = new SpringRow(row[1..], configs, currentCount + 1, this.isFinished).Combinations();
+                StoreState(result);
+                return result;
+            }
+            else if (current == '?')
+            {
+                var firstRow = HashTagRow();
+                var secondRow = DotRow();
+                var result = firstRow.Combinations() + secondRow.Combinations();
+                return result;
+
+                SpringRow HashTagRow() => new SpringRow("#" + row[1..], configs, this.currentCount, this.isFinished);
+                SpringRow DotRow() => new SpringRow("." + row[1..], configs, this.currentCount, this.isFinished);
+            }
+            else
+            {
+                if (isFinished && currentCount > 0)
+                {
+                    return 0;
+                }
+
+                var newConfigs = configs;
+                var newCount = currentCount;
+
+                if (currentCount == config)
+                {
+                    newConfigs = configs[1..];
+                    newCount = 0;
+                    if (newConfigs.Length == 0)
                     {
-                        galaxies.Add((pos, i));
+                        this.isFinished = true;
                     }
-
-                    hasGalaxy = isGalaxy || hasGalaxy;
                 }
 
-                if (!hasGalaxy)
+                if (currentCount > 0 && currentCount < config)
                 {
-                    expandedRows.Add(i);
+                    return 0;
                 }
-            }
 
-            for (var i = 0; i < matrix.ColumnCount; i++)
-            {
-                var row = matrix.GetColumn(i);
-                if (!row.Any(x => x == '#'))
-                {
-                    expandedCols.Add(i);
-                }
+                var result = new SpringRow(row[1..], newConfigs, newCount, this.isFinished).Combinations();
+                StoreState(result);
+                return result;
             }
-
-            this.SolveProblem(expandedRows, expandedCols, galaxies, ExpandedSizePart1);
-            this.SolveProblem(expandedRows, expandedCols, galaxies, ExpandedSizePart2);
         }
 
-        public void SolveProblem(HashSet<int> expandedRows, HashSet<int> expandedCols, List<(int x, int y)> galaxies, int expandedSize)
+        private void StoreState(long storedValue)
         {
-            long totalDist = 0;
-            for (var i = 0; i < galaxies.Count; i++)
+            var configsLeftstring = this.Stringify();
+            TryAdd(row, configsLeftstring, storedValue);
+        }
+
+        private void TryAdd(string rowy, string configString, long valuee)
+        {
+            if (!Problem12.memory.ContainsKey((rowy, configString)) && !string.IsNullOrEmpty(rowy))
             {
-                for (var x = i + 1; x < galaxies.Count; x++)
-                {
-                    var from = galaxies[i];
-                    var to = galaxies[x];
-                    totalDist += DistanceFrom(from.x, from.y, to.x, to.y);
-                }
-            }
-
-            this.PrintResult(totalDist);
-
-            long DistanceFrom(int x, int y, int toX, int toY)
-            {
-                var dx = GetDelta(x, toX);
-                var dy = GetDelta(y, toY);
-                long xDist = 0, yDist = 0;
-                while (x != toX)
-                {
-                    xDist += expandedCols.Contains(x) ? expandedSize : 1;
-                    x += dx;
-                }
-
-                while (y != toY)
-                {
-                    yDist += expandedRows.Contains(y) ? expandedSize : 1;
-                    y += dy;
-                }
-
-                return xDist + yDist;
-            }
-
-            int GetDelta(int from, int to)
-            {
-                if (to > from)
-                {
-                    return 1;
-                }
-                else if (from > to)
-                {
-                    return -1;
-                }
-
-                return 0;
+                Problem12.memory.Add((rowy, configString), valuee);
             }
         }
-     }
+    }
 }

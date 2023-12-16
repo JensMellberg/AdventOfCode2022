@@ -24,35 +24,20 @@ namespace AdventOfCode2022
 			return self.Substring(0, index) + replacement + self[(index + 1)..];
 		}
 
-		/*public static List<List<T>> GetPermutations<T>(this IList<T> list)
-		{
-			var result = new List<List<T>>();
-			GetPermutations(list, result, 0, list.Count - 1);
-			return result;
-		}
+		public static bool IsHorizontal(this Direction self) => self == Direction.Left || self == Direction.Right;
 
-		private static void GetPermutations<T>(List<T> original, List<List<T>> result, int firstIndex, int lastIndex)
-		{
-			if (firstIndex == lastIndex)
-			{
-				result.Add(new List<T>(original));
-			}
-			else
-			{
-				for (int i = firstIndex; i <= lastIndex; i++)
-				{
-					Swap(ref original[firstIndex], ref original[i]);
-                    GetPermutations(original, result, firstIndex + 1, lastIndex);
-					Swap(ref original[firstIndex], ref original[i]);
-				}
-			}
+		public static bool IsVertical(this Direction self) => !self.IsHorizontal();
 
-			void Swap(ref T a, ref T b)
-			{
-                var temp = a;
-				a = b;
-				b = temp;
-			}
-		}*/
-	}
+		public static (int x, int y) GetDelta(this Direction self)
+		{
+            return self switch
+            {
+                Direction.Left => (-1, 0),
+                Direction.Right => (1, 0),
+                Direction.Up => (0, -1),
+                Direction.Down => (0, 1),
+                _ => default,
+            };
+        }
+    }
 }

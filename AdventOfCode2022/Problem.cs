@@ -84,4 +84,12 @@ namespace AdventOfCode2022
         Reject,
         Keep
     }
+
+	public enum Direction
+	{
+		Left,
+		Right,
+		Up,
+		Down
+	}
 }
