@@ -35,6 +35,7 @@ namespace AdventOfCode2022.TwentyThree
                     }
 
                 }
+
                 contained.ForEach(x => coordinates[x.X, x.Y, x.Z - offset + 1] = brick.Id);
             }
 

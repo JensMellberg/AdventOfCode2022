@@ -30,6 +30,24 @@ namespace AdventOfCode2022
 			return absolute ? Math.Abs(distance) : distance;
 		}
 
+		public bool IsBetweenX(Point p1, Point p2)
+		{
+			Point start;
+			Point end;
+			if (p1.X < p2.X)
+			{
+				start = p1;
+				end = p2;
+			}
+			else
+			{
+				start = p2;
+				end = p1;
+			}
+
+			return X > start.X || X < end.X;
+		}
+
 		public int ManhattanDistance(Point other) => this.XDistance(other, true) + this.YDistance(other, true);
 
 		public override string ToString() => X + "," + Y;
