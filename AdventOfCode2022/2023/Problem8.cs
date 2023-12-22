@@ -32,7 +32,7 @@ namespace AdventOfCode2022.TwentyThree
 
             var current = "AAA";
             var steps = 0;
-            while (current != "ZZZ" && false)
+            while (current != "ZZZ")
             {
                 var instruction = instructions.GetInstruction();
                 instructions.Next();
@@ -104,24 +104,7 @@ namespace AdventOfCode2022.TwentyThree
                 }
             }
 
-            this.PrintResult(LowestCommonMultiple(newCurrents.Select(x => x.Item3)));
-        }
-
-        static long GreatestCommonDivider(long n1, long n2)
-        {
-            if (n2 == 0)
-            {
-                return n1;
-            }
-            else
-            {
-                return GreatestCommonDivider(n2, n1 % n2);
-            }
-        }
-
-        public static long LowestCommonMultiple(IEnumerable<long> numbers)
-        {
-            return numbers.Aggregate((S, val) => S * val / GreatestCommonDivider(S, val));
+            this.PrintResult(ParsableUtils.LowestCommonMultiple(newCurrents.Select(x => x.Item3)));
         }
 
         private class Instructions

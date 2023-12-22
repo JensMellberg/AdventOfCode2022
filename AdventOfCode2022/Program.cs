@@ -12,7 +12,7 @@ namespace AdventOfCode2022
 
         static void Main(string[] args)
 		{
-            Console.WriteLine("Type the specific day you want to solve the problem for or an empty line for the latest problem.");
+            Console.WriteLine("Type the specific day you want to solve the problem for or an empty line for the latest problem. Or \"RunAll\"!");
             while (true)
 			{
                 var command = Console.ReadLine();

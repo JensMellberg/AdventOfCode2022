@@ -34,7 +34,9 @@ namespace AdventOfCode2022
 				.Select(ParseDataLine);
 		}
 
-		protected abstract T ParseDataLine(string line);
+        public static Direction[] AllDirections = { Direction.Left, Direction.Right, Direction.Up, Direction.Down };
+
+        protected abstract T ParseDataLine(string line);
 
 		protected void PrintResult(string result)
 		{
