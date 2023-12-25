@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 
 namespace AdventOfCode2022.TwentyThree
@@ -25,7 +26,7 @@ namespace AdventOfCode2022.TwentyThree
                 var delta = instr.Direction.GetDelta();
                 point.X += delta.x * instr.Steps;
                 point.Y += delta.y * instr.Steps;
-                /* Point start;
+                 Point start;
                  Point end;
                  if (instr.Direction.IsHorizontal())
                  {
@@ -52,7 +53,7 @@ namespace AdventOfCode2022.TwentyThree
                          start = point;
                          end = oldPoint;
                      }
-                 }*/
+                 }
 
                 var line = new DigLine { StartPoint = oldPoint.Copy(), EndPoint = point.Copy(), Direction = instr.Direction };
 
@@ -72,7 +73,7 @@ namespace AdventOfCode2022.TwentyThree
             var yLines = lines.Where(x => x.Direction.IsHorizontal()).ToList();
             long totalArea = 0;
             Printer();
-            Console.ReadLine();
+
             while (yLines.Any())
             {
                 var sorted = yLines.OrderBy(x => x.StartPoint.Y).ToList();
@@ -83,8 +84,8 @@ namespace AdventOfCode2022.TwentyThree
                 var prevDist = min.PreviousLine.Distance();
                 var nextDist = min.NextLine.Distance();
                 long height = Math.Min(prevDist, nextDist);
+                var inbetweenLines = new List<DigLine>();
 
-                DigLine inbetweenline = null;
                 foreach (var line in sorted.Skip(1))
                 {
                     if (line.StartPoint.Y > min.StartPoint.Y + height)
@@ -92,12 +93,11 @@ namespace AdventOfCode2022.TwentyThree
                         break;
                     }
 
-                    /*if (!(line == min.PreviousLine || line == min.NextLine) && (line.StartPoint.IsBetweenX(min.StartPoint, min.EndPoint) || line.StartPoint.IsBetweenX(min.StartPoint, min.EndPoint)))
+                    if (!(line == min.PreviousLine.PreviousLine || line == min.NextLine.NextLine) && (line.StartPoint.IsBetweenX(min.StartPoint, min.EndPoint) || line.StartPoint.IsBetweenX(min.StartPoint, min.EndPoint)))
                     {
-                        inbetweenline = line;
-                        height = line.StartPoint.Y - min.StartPoint.Y;
-                        break;
-                    }*/
+                        inbetweenLines.Add(line);
+                        height = Math.Min(line.StartPoint.Y - min.StartPoint.Y, height);
+                    }
                 }
 
                 min.StartPoint.Y += (int)height;
@@ -105,40 +105,69 @@ namespace AdventOfCode2022.TwentyThree
                 
                 //yLines.Remove(min);
 
-                if (inbetweenline == null)
+                if (inbetweenLines.Count == 0)
                 {
                     if (prevDist < nextDist)
                     {
+                        DigLine target;
                         if (min.PreviousLine.PreviousLine.Direction == min.Direction.Reverse())
                         {
-                            min.ConnectStart(min.PreviousLine.PreviousLine.PreviousLine);
+                            target = min.PreviousLine.PreviousLine.PreviousLine;
+                            totalArea += min.PreviousLine.PreviousLine.Distance();
+                            this.Print(min.PreviousLine.PreviousLine.Distance().ToString());
                         }
                         else
                         {
-                            min.ConnectStart(min.PreviousLine.PreviousLine);
+                            target = min.PreviousLine.PreviousLine;
                         }
 
+                        min.ConnectStart(target);
                         min.NextLine.StartPoint.Y += (int)height;
-
                     }
                     else if (nextDist < prevDist)
                     {
-                        min.PreviousLine.EndPoint.Y += (int)nextDist;
+                        DigLine target;
+                        if (min.NextLine.NextLine.Direction == min.Direction.Reverse())
+                        {
+                            target = min.NextLine.NextLine.NextLine;
+                            totalArea += min.NextLine.NextLine.Distance();
+                            this.Print(min.NextLine.NextLine.Distance().ToString());
+                        }
+                        else
+                        {
+                            target = min.NextLine.NextLine;
+                        }
 
-                        //var newWidth = min.PreviousLine.EndPoint.XDistance(min.NextLine.StartPoint, true);
-                        min.StartPoint.X = min.PreviousLine.EndPoint.X;
-                        min.EndPoint.X = min.NextLine.StartPoint.X;
-                        min.PreviousLine.EndPoint.Y += (int)height;
+                        min.ConnectEnd(target);
+                        min.PreviousLine.EndPoint.Y += (int)nextDist;
                     }
                     else
                     {
                         if (yLines.Count == 2)
                         {
-                            totalArea += width * min.NextLine.Distance();
+                            totalArea += (width + 1) * (min.NextLine.Distance() + 1);
+                            this.PrintResult(totalArea);
+                            return;
                             break;
                         }
 
-                        min.PreviousLine.PreviousLine.NextLine = min;
+                        if (min.PreviousLine.PreviousLine.Direction == min.Direction.Reverse())
+                        {
+                            totalArea += min.PreviousLine.PreviousLine.Distance();
+                            this.Print(min.PreviousLine.PreviousLine.Distance().ToString());
+                        }
+
+                        if (min.NextLine.NextLine.Direction == min.Direction.Reverse())
+                        {
+                            totalArea += min.NextLine.NextLine.Distance();
+                            this.Print(min.NextLine.NextLine.Distance().ToString());
+                        }
+
+                        min.ConnectStart(min.PreviousLine.PreviousLine.PreviousLine);
+                        min.ConnectEnd(min.NextLine.NextLine.NextLine);
+
+
+                        /*min.PreviousLine.PreviousLine.NextLine = min;
                         min.NextLine.NextLine.PreviousLine = min;
 
                         //
@@ -146,23 +175,54 @@ namespace AdventOfCode2022.TwentyThree
                         min.PreviousLine.PreviousLine.EndPoint = min.NextLine.NextLine.EndPoint;
                         min.PreviousLine.PreviousLine.NextLine = min.NextLine.NextLine.NextLine;
                         min.NextLine.NextLine.NextLine.PreviousLine = min.PreviousLine.PreviousLine;
+
                         yLines.Remove(min);
-                        yLines.Remove(temp);
+                        min = temp.NextLine;
+                        yLines.Remove(temp);*/
+                    }
+                }
+                else
+                {
+                    var relevantLines = inbetweenLines.Where(x => x.StartPoint.Y == inbetweenLines[0].StartPoint.Y).OrderBy(x => x.StartPoint.X).ToList();
+                    var firstY = relevantLines[0].StartPoint.Y;
+                    if (firstY < prevDist && firstY < nextDist)
+                    {
+                        min.PreviousLine.EndPoint.Y += (int)height;
+                        min.NextLine.StartPoint.Y += (int)height;
+                    }
+
+                    var end = min.NextLine;
+                    var startLine = min.PreviousLine;
+                    foreach (var l in relevantLines)
+                    {
+                        var newLine = new DigLine();
+                        newLine.ConnectStart(startLine);
+                        newLine.ConnectEnd(l.NextLine);
+                        startLine = l;
                     }
                 }
 
-                totalArea += width * height;
-                yLines = this.RemoveOrphans(yLines, min).Where(x => x.Direction.IsHorizontal()).ToList();
+                totalArea += (width + 1) * (height);
+                yLines = this.RemoveOrphans(min).Where(x => x.Direction.IsHorizontal()).ToList();
                 Printer();
-                Console.ReadLine();
+                this.Print(((width + 1) * (height)).ToString());
             }
 
             void Printer()
             {
+                return;
                 var matrix = Matrix.InitWithStartValue(10, 7, '.');
-                var (xx, yy) = (0, 0);
-                matrix[0, 0] = '#';
-                var firstLine = lines[0];
+                
+                var firstLine = yLines.FindMin(x => (long)x.StartPoint.Y);
+                var (xx, yy) = (firstLine.StartPoint.X, firstLine.StartPoint.Y);
+                matrix[xx, yy] = firstLine.Direction switch
+                {
+                    Direction.Left => '<',
+                    Direction.Right => '>',
+                    Direction.Up => '^',
+                    Direction.Down => 'v',
+                };
+
                 var currentLine = firstLine;
                 var isFirstLoop = true;
                 while (currentLine != firstLine || isFirstLoop)
@@ -172,7 +232,9 @@ namespace AdventOfCode2022.TwentyThree
                     {
                         xx += delta.x;
                         yy += delta.y;
-                        matrix[xx, yy] = '#';
+                        if (matrix[xx, yy] == '.') {
+                            matrix[xx, yy] = currentLine.Id.ToString()[0];
+                        };
                     }
 
                     isFirstLoop = false;
@@ -180,10 +242,11 @@ namespace AdventOfCode2022.TwentyThree
                 }
 
                 this.Print(matrix.ToString(x => x.ToString(), ""));
+                Console.ReadLine();
             }
         }
 
-        private IEnumerable<DigLine> RemoveOrphans(IEnumerable<DigLine> lines, DigLine start)
+        private IEnumerable<DigLine> RemoveOrphans(DigLine start)
         {
             var startId = start.Id;
             var isFirst = true;
@@ -232,7 +295,7 @@ namespace AdventOfCode2022.TwentyThree
             public void ConnectStart(DigLine other)
             {
                 this.PreviousLine = other;
-                this.StartPoint = other.StartPoint.Copy();
+                this.StartPoint = other.EndPoint.Copy();
                 other.NextLine = this;
             }
 
@@ -240,7 +303,7 @@ namespace AdventOfCode2022.TwentyThree
             {
                 this.NextLine = other;
                 other.PreviousLine = this;
-                this.EndPoint = other.EndPoint.Copy();
+                this.EndPoint = other.StartPoint.Copy();
             }
         }
     }

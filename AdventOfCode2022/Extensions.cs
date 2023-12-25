@@ -36,7 +36,24 @@ namespace AdventOfCode2022
 			return min;
 		}
 
-		public static string ReplaceAtIndex(this string self, int index, char replacement)
+        public static T FindMax<T>(this IEnumerable<T> enumerable, Func<T, long> predicate)
+        {
+            var max = default(T);
+            var maxValue = long.MinValue;
+            foreach (var item in enumerable)
+            {
+                var value = predicate(item);
+                if (value > maxValue)
+                {
+                    max = item;
+                    maxValue = value;
+                }
+            }
+
+            return max;
+        }
+
+        public static string ReplaceAtIndex(this string self, int index, char replacement)
 		{
 			return self.Substring(0, index) + replacement + self[(index + 1)..];
 		}
