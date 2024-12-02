@@ -1,10 +1,17 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "0yy+th7ipbE=",
+=======
+  "dgSpecHash": "a0Gpbu03GAETeVrlG7hut4D9inWGVyVGsNbsbx/S4a0ozl+/Dai0Xt/R4vybSweQEhB4WrXIApqwKcI3Z6RRjQ==",
+>>>>>>> db0e4fd729d7e7b7f0a4dbef9b3eca355652d7bd
   "success": true,
-  "projectFilePath": "C:\\Users\\jens_\\source\\repos\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
+  "projectFilePath": "C:\\Users\\Camilla\\source\\repos\\AdventOfCode\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\jens_\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.32\\microsoft.netcore.app.host.win-x64.3.1.32.nupkg.sha512"
+    "C:\\Users\\Camilla\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\Camilla\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\Camilla\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "C:\\Users\\Camilla\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.32\\microsoft.netcore.app.host.win-x64.3.1.32.nupkg.sha512"
   ],
   "logs": []
 }

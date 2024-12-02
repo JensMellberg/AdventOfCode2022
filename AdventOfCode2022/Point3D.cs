@@ -6,13 +6,13 @@ namespace AdventOfCode2022
 {
 	public class Point3D
     {
-		public int X { get; set; }
+		public long X { get; set; }
 
-		public int Y { get; set; }
+		public long Y { get; set; }
 
-		public int Z { get; set; }
+		public long Z { get; set; }
 
-		public Point3D(int x, int y, int z)
+		public Point3D(long x, long y, long z)
 		{
 			this.X = x;
 			this.Y = y;
@@ -21,25 +21,25 @@ namespace AdventOfCode2022
 
 		public Point3D Copy() => new Point3D(this.X, this.Y, this.Z);
 
-		public int XDistance(Point3D other, bool absolute)
+		public long XDistance(Point3D other, bool absolute)
 		{
 			var distance = other.X - this.X;
 			return absolute ? Math.Abs(distance) : distance;
 		}
 
-		public int YDistance(Point3D other, bool absolute)
+		public long YDistance(Point3D other, bool absolute)
 		{
 			var distance = other.Y - this.Y;
 			return absolute ? Math.Abs(distance) : distance;
 		}
 
-        public int ZDistance(Point3D other, bool absolute)
+        public long ZDistance(Point3D other, bool absolute)
         {
             var distance = other.Z - this.Z;
             return absolute ? Math.Abs(distance) : distance;
         }
 
-        public int ManhattanDistance(Point3D other) => this.XDistance(other, true) + this.YDistance(other, true) + this.ZDistance(other, true);
+        public long ManhattanDistance(Point3D other) => this.XDistance(other, true) + this.YDistance(other, true) + this.ZDistance(other, true);
 
         public override bool Equals(object obj)
         {
@@ -56,7 +56,7 @@ namespace AdventOfCode2022
 		public static Point3D FromString(string line)
 		{
 			var tokens = line.Split(',');
-			return new Point3D(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2]));
+			return new Point3D(long.Parse(tokens[0]), long.Parse(tokens[1]), long.Parse(tokens[2]));
 		}
 	}
 }

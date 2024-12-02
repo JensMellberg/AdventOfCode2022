@@ -8,24 +8,19 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\jens_\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Camilla\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jens_\\source\\repos\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
+      "projectUniqueName": "C:\\Users\\Camilla\\source\\repos\\AdventOfCode\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
       "projectName": "AdventOfCode2022",
-      "projectPath": "C:\\Users\\jens_\\source\\repos\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
-      "packagesPath": "C:\\Users\\jens_\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jens_\\source\\repos\\AdventOfCode2022\\AdventOfCode2022\\obj\\",
+      "projectPath": "C:\\Users\\Camilla\\source\\repos\\AdventOfCode\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
+      "packagesPath": "C:\\Users\\Camilla\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Camilla\\source\\repos\\AdventOfCode\\AdventOfCode2022\\AdventOfCode2022\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\jens_\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Camilla\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -69,8 +64,20 @@
         "warn": true,
         "downloadDependencies": [
           {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[3.1.10, 3.1.10]"
+          },
+          {
             "name": "Microsoft.NETCore.App.Host.win-x64",
             "version": "[3.1.32, 3.1.32]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
           }
         ],
         "frameworkReferences": {
@@ -78,7 +85,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100\\RuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+>>>>>>> db0e4fd729d7e7b7f0a4dbef9b3eca355652d7bd
       }
     }
   }
