@@ -8,81 +8,156 @@ namespace AdventOfCode2022
 {
 	public class PatternParser
 	{
-		// Maybe implement in future.
 		private List<Token> tokens = new List<Token>();
 		private const char Separator = '¤';
 		public PatternParser(string pattern)
 		{
 			var index = 0;
-			while (index < pattern.Length)
+            string variable = null;
+            string constant = null;
+            while (index < pattern.Length)
 			{
 				if (pattern[index] == Separator)
 				{
 					index++;
-					string value = "";
-					while (pattern[index] != Separator)
+					variable = "";
+                    while (pattern[index] != Separator)
 					{
-						value += pattern[index];
+                        variable += pattern[index];
 						index++;
 					}
 
-					tokens.Add(new Variable { Value = value });
 					index++;
-				}
+					if (index == pattern.Length)
+					{
+                        tokens.Add(new Token { VariableName = variable, TrailingPattern = null });
+                    }
+                }
 				else
 				{
-                    string value = "";
-                    while (pattern[index] != Separator && index < pattern.Length)
+                    constant = "";
+                    while (index < pattern.Length && pattern[index] != Separator)
                     {
-                        value += pattern[index];
+                        constant += pattern[index];
                         index++;
                     }
 
-					tokens.Add(new Constant { Value = value });
+                    tokens.Add(new Token { VariableName = variable, TrailingPattern = constant });
                 }
 			}
 		}
 
-		public T ParseObject<T>(string line)
+		public T ParseObject<T>(string line) where T : new()
 		{
 			var currentIndex = 0;
-			var current = this.tokens[0];
-			Token nextConstant = null;
+			var currentToken = this.tokens[0];
 			var stringIndex = 0;
-			while (currentIndex < this.tokens.Count)
+			var currentVariable = "";
+			var currentConstant = "";
+			var currentConstantIndex = 0;
+			var result = new List<(string variableName, string variableValue)>();
+			while (stringIndex < line.Length)
 			{
-				if (current is Variable)
+				if (currentToken.TrailingPattern == null)
 				{
-					if (currentIndex < this.tokens.Count - 1)
-					{
-						nextConstant = this.tokens[currentIndex + 1];
-					} 
-					else
-					{
-                        // Create object
-                        continue;
-                    }
-
-					var value = ""; //TODO
+					currentVariable = line.Substring(stringIndex);
+					stringIndex = line.Length;
+					AddResult();
+                    break;
 				}
+
+				var character = line[stringIndex];
+				if (character == currentToken.TrailingPattern[currentConstantIndex])
+				{
+					currentConstant += character;
+					currentConstantIndex++;
+					if (currentConstant.Length == currentToken.TrailingPattern.Length)
+					{
+                        AddResult();
+					}
+				} 
+				else
+				{
+					currentConstantIndex = 0;
+					currentVariable += currentConstant + character;
+					currentConstant = "";
+				}
+
+				stringIndex++;
+
+				void AddResult()
+				{
+					result.Add((currentToken.VariableName, currentVariable));
+					currentVariable = "";
+                    currentConstant = "";
+                    currentConstantIndex = 0;
+					currentIndex++;
+					currentToken = currentIndex == this.tokens.Count ? null : this.tokens[currentIndex];
+                }
 			}
 
-			return default(T);
-		}
+			var returnObject = new T();
+			var counter = 1;
+			foreach (var attribute in result)
+			{
+                var propertyInfo = returnObject.GetType().GetProperty(attribute.variableName);
+				if (propertyInfo == null)
+				{
+					var tupleProperty = returnObject.GetType().GetField("Item" + counter);
+					if (tupleProperty != null)
+					{
+						SetField(tupleProperty);
+					}
+					else
+					{
+                        throw new Exception($"No valid property on type {returnObject.GetType()}");
+                    }
+				}
+				else
+				{
+					SetProperty();
+				}
 
-		private class Variable : Token
-		{
-			public string Value { get; set; }
-		}
+				counter++;
 
-		private class Constant : Token
-		{
-            public string Value { get; set; }
+				void SetField(FieldInfo fi)
+				{
+                    var targetType = fi.FieldType;
+					object tempObj = returnObject;
+					fi.SetValue(tempObj, CastValue(targetType, attribute.variableValue));
+					returnObject = (T)tempObj;
+                }
+
+				void SetProperty()
+				{
+                    var targetType = propertyInfo.PropertyType;
+                    propertyInfo.SetValue(returnObject, CastValue(targetType, attribute.variableValue));
+                }
+
+                object CastValue(Type targetType, string value)
+                {
+                    if (targetType == typeof(int))
+                    {
+						return int.Parse(value);
+                    }
+                    else if (targetType == typeof(long))
+                    {
+                        return long.Parse(value);
+                    }
+
+					return value;
+                }
+            }
+
+
+			return returnObject;
         }
 
-		private interface Token
+		private class Token
 		{
-            string Value { get; set; }
+            public string TrailingPattern { get; set; }
+
+			public string VariableName { get; set; }
         }
     }
 }

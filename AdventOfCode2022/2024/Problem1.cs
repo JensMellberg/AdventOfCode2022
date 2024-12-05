@@ -4,20 +4,20 @@ using System.Linq;
 
 namespace AdventOfCode2022.TwentyFour
 {
-    public class Problem1 : StringProblem
+    public class Problem1 : PatternProblem<(int first, int second)>
     {
-        public override void Solve(IEnumerable<string> testData)
+        protected override string Pattern => "¤first¤   ¤second¤";
+
+        public override void Solve(IEnumerable<(int first, int second)> testData)
         {
             var list1 = new List<int>();
             var list2 = new List<int>();
             var list2AppearanceCounts = new int[100000];
             foreach (var l in testData)
             {
-                var tokens = l.Split(' ');
-                var list2Entry = int.Parse(tokens[tokens.Length - 1]);
-                list1.Add(int.Parse(tokens[0]));
-                list2.Add(list2Entry);
-                list2AppearanceCounts[list2Entry]++;
+                list1.Add(l.first);
+                list2.Add(l.second);
+                list2AppearanceCounts[l.second]++;
             }
 
             list1.Sort();

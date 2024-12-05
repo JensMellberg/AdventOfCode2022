@@ -14,6 +14,7 @@ namespace AdventOfCode2022.TwentyThree
 
         public override void Solve(IEnumerable<string> testData)
         {
+            var lineParser = new PatternParser("¤location¤ = (¤left¤, ¤right¤)");
             var testArray = testData.ToArray();
             var testParser = new TokenParser(testArray);
             var instructionString = testParser.Pop();
@@ -22,11 +23,7 @@ namespace AdventOfCode2022.TwentyThree
 
             while (!testParser.IsFinished)
             {
-                var parser = new TokenParser(testParser.Pop());
-                var location = parser.Pop();
-                parser.Skip();
-                var left = parser.Pop().Replace("(", "").Replace(",", "");
-                var right = parser.Pop().Replace(")", "");
+                var (location, left, right) = lineParser.ParseObject<(string location, string left, string right)>(testParser.Pop());
                 nodebyLocation.Add(location, new Node(left, right));
             }
 

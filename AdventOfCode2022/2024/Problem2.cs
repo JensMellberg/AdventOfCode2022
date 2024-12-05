@@ -16,9 +16,9 @@ namespace AdventOfCode2022.TwentyFour
         }    
     }
 
-    public class ReportData : Parsable
+    public class ReportData : ListParsable<int>
     {
-        public int[] values;
+        protected override string Separator => " ";
         public bool IsSafe()
         {
             const int minDiff = 1;
@@ -26,9 +26,9 @@ namespace AdventOfCode2022.TwentyFour
             bool? previousDirection = null;
             int? previousValue = null;
 
-            for (var i = 0; i < this.values.Length; i++)
+            for (var i = 0; i < this.Values.Count; i++)
             {
-                var val = this.values[i];
+                var val = this.Values[i];
                 if (previousValue.HasValue)
                 {
                     var newDirection = val > previousValue.Value;
@@ -57,17 +57,11 @@ namespace AdventOfCode2022.TwentyFour
 
         public IEnumerable<ReportData> Clones()
         {
-            for (var i = 0; i < this.values.Length; i++)
+            for (var i = 0; i < this.Values.Count; i++)
             {
-                var clonedArray = this.values.Take(i).Concat(this.values.Skip(i + 1)).ToArray();
-                yield return new ReportData { values = clonedArray };
+                var clonedList = this.Values.Take(i).Concat(this.Values.Skip(i + 1)).ToList();
+                yield return new ReportData { Values = clonedList };
             }
-        }
-
-        public override void ParseFromLine(string line)
-        {
-            this.values = line.Split(' ').Select(int.Parse).ToArray();
-            base.ParseFromLine(line);
         }
     }
 }
