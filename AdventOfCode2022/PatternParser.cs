@@ -67,7 +67,9 @@ namespace AdventOfCode2022
 				}
 
 				var character = line[stringIndex];
-				if (character == currentToken.TrailingPattern[currentConstantIndex])
+				var patternCharacter = currentToken.TrailingPattern[currentConstantIndex];
+
+                if (character == patternCharacter || patternCharacter == '$')
 				{
 					currentConstant += character;
 					currentConstantIndex++;
@@ -87,7 +89,11 @@ namespace AdventOfCode2022
 
 				void AddResult()
 				{
-					result.Add((currentToken.VariableName, currentVariable));
+					if (currentToken.VariableName != null && currentToken.VariableName != "_")
+					{
+                        result.Add((currentToken.VariableName, currentVariable));
+                    }
+					
 					currentVariable = "";
                     currentConstant = "";
                     currentConstantIndex = 0;

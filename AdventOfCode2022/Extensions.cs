@@ -74,7 +74,19 @@ namespace AdventOfCode2022
             };
         }
 
-		public static (int x, int y) GetDelta(this Direction self)
+        public static Direction TurnClockwise(this Direction self)
+        {
+            return self switch
+            {
+                Direction.Left => Direction.Up,
+                Direction.Right => Direction.Down,
+                Direction.Up => Direction.Right,
+                Direction.Down => Direction.Left,
+                _ => default,
+            };
+        }
+
+        public static (int x, int y) GetDelta(this Direction self)
 		{
             return self switch
             {

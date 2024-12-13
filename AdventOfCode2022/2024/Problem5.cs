@@ -12,6 +12,22 @@ namespace AdventOfCode2022.TwentyFour
         protected override void Solve(IEnumerable<OrderRule> rules, IEnumerable<ProducePages> pages)
         {
             this.PrintResult(pages.Sum(x => rules.All(rule => x.SatisfiesRule(rule)) ? x.MiddlePage : 0));
+            var incorrectPages = pages.Where(x => !rules.All(rule => x.SatisfiesRule(rule))).ToArray();
+
+            foreach (var page in incorrectPages)
+            {
+                var hasChange = true;
+                while (hasChange)
+                {
+                    hasChange = false;
+                    foreach (var rule in rules)
+                    {
+                        hasChange = page.SatisfyRule(rule) || hasChange;
+                    }
+                }
+            }
+
+            this.PrintResult(incorrectPages.Sum(x => x.MiddlePage));
         }
     }
 
@@ -34,6 +50,30 @@ namespace AdventOfCode2022.TwentyFour
             }
 
             return this.PageIndexes[rule.First] < this.PageIndexes[rule.Second];
+        }
+
+        public bool SatisfyRule(OrderRule rule)
+        {
+            if (!SatisfiesRule(rule))
+            {
+                var middleIndex = this.Values.Count / 2;
+                var firstIndex = this.PageIndexes[rule.First];
+                var secondIndex = this.PageIndexes[rule.Second];
+                this.PageIndexes[rule.First] = secondIndex;
+                this.PageIndexes[rule.Second] = firstIndex;
+                if (firstIndex == middleIndex)
+                {
+                    this.MiddlePage = rule.Second;
+                }
+                else if (secondIndex == middleIndex)
+                {
+                    this.MiddlePage = rule.First;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public int MiddlePage { get; private set; }

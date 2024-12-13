@@ -17,7 +17,7 @@ namespace AdventOfCode2022
 			originalLine = line;
 		}
 
-		private object ConvertValue(string value)
+		protected virtual object ConvertValue(string value)
 		{
 			if (typeof(T) == typeof(int))
 			{
