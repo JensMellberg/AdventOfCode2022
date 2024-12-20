@@ -36,13 +36,38 @@ namespace AdventOfCode2022
 				else
 				{
                     constant = "";
+					var alternativesByIndex = new Dictionary<int, List<string>>();
                     while (index < pattern.Length && pattern[index] != Separator)
                     {
+						if (pattern[index] == '[')
+						{
+							var alternatives = new List<string>();
+							alternativesByIndex.Add(constant.Length, alternatives);
+							var currentAlt = "";
+							index++;
+							while (pattern[index] != ']')
+							{
+                                if (pattern[index] == '|')
+								{
+									alternatives.Add(currentAlt);
+									currentAlt = "";
+								}
+								else
+								{
+									currentAlt += pattern[index];
+								}
+
+                                index++;
+							}
+
+							alternatives.Add(currentAlt);
+						}
+
                         constant += pattern[index];
                         index++;
                     }
 
-                    tokens.Add(new Token { VariableName = variable, TrailingPattern = constant });
+                    tokens.Add(new Token { VariableName = variable, TrailingPattern = constant, AlternativesByIndex = alternativesByIndex });
                 }
 			}
 		}
@@ -68,8 +93,32 @@ namespace AdventOfCode2022
 
 				var character = line[stringIndex];
 				var patternCharacter = currentToken.TrailingPattern[currentConstantIndex];
+				if (currentToken.AlternativesByIndex.TryGetValue(currentConstantIndex, out var alternatives)) {
+					var tempConstantIndex = currentConstantIndex;
+					foreach (var alt in alternatives)
+					{
+						if (line.Substring(stringIndex, alt.Length) == alt)
+						{
+							stringIndex += alt.Length;
+                            character = line[stringIndex];
+                            currentConstantIndex++;
+							currentConstant += "]";
+							break;
+						}
+					}
 
-                if (character == patternCharacter || patternCharacter == '$')
+					if (currentConstantIndex == currentToken.TrailingPattern.Length)
+					{
+                        AddResult();
+						continue;
+                    }
+					else
+					{
+						patternCharacter = currentToken.TrailingPattern[currentConstantIndex];
+                    }
+				}
+                
+				if (character == patternCharacter || patternCharacter == '$')
 				{
 					currentConstant += character;
 					currentConstantIndex++;
@@ -142,6 +191,13 @@ namespace AdventOfCode2022
 
                 object CastValue(Type targetType, string value)
                 {
+                    if (typeof(Parsable).IsAssignableFrom(targetType))
+                    {
+                        var valueObject = (Parsable)Activator.CreateInstance(targetType);
+                        valueObject.ParseFromLine(attribute.variableValue);
+						return valueObject;
+                    }
+
                     if (targetType == typeof(int))
                     {
 						return int.Parse(value);
@@ -164,6 +220,8 @@ namespace AdventOfCode2022
             public string TrailingPattern { get; set; }
 
 			public string VariableName { get; set; }
+
+			public Dictionary<int, List<string>> AlternativesByIndex { get; set; }
         }
     }
 }

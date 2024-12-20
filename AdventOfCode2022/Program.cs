@@ -33,6 +33,10 @@ namespace AdventOfCode2022
 				{
                     BenchMark();
 				}
+                else if (command.Equals("-RunTests", StringComparison.OrdinalIgnoreCase))
+                {
+                    TestRunner.RunTests();
+                }
                 else if (tokens[0].Equals("-year", StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Year set to {tokens[1]}");

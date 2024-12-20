@@ -19,7 +19,7 @@ namespace AdventOfCode2022.TwentyFour
                 {
                     if (matrix[x, y] == FullWord[0])
                     {
-                        counter += matrix.GetAdjacentCoordinates(x, y).Count(tup => CheckForXmas(x, y, tup.x - x, tup.y - y));
+                        counter += matrix.GetAdjacentCoordinatesDiagonally(x, y).Count(tup => CheckForXmas(x, y, tup.x - x, tup.y - y));
                     }
                     else if (matrix[x, y] == 'A' && matrix.IsInBounds(x - 1, y - 1) && matrix.IsInBounds(x + 1, y + 1))
                     {

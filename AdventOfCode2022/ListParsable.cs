@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AdventOfCode2022
 {
-	public abstract class ListParsable<T> : Parsable
+	public class ListParsable<T> : Parsable
 	{
 		public List<T> Values;
 

@@ -15,7 +15,7 @@ namespace AdventOfCode2022
 
         public abstract void Solve(IEnumerable<T> testData);
 
-		private bool supressPrints;
+		protected bool supressPrints;
 
 		private List<string> Answers = new List<string>();
 

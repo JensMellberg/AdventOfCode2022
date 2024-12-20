@@ -52,7 +52,7 @@ namespace AdventOfCode2022
 			}
 		}
 
-		public IEnumerable<(int x, int y)> GetAdjacentCoordinates(int x, int y)
+        public IEnumerable<(int x, int y)> GetAdjacentCoordinates(int x, int y)
 		{
             if (this.IsInBounds(x - 1, y))
             {
@@ -64,16 +64,6 @@ namespace AdventOfCode2022
                 yield return (x + 1, y);
             }
 
-            if (this.IsInBounds(x - 1, y - 1))
-            {
-                yield return (x - 1, y - 1);
-            }
-
-            if (this.IsInBounds(x - 1, y + 1))
-            {
-                yield return (x - 1, y + 1);
-            }
-
             if (this.IsInBounds(x, y + 1))
             {
                 yield return (x, y + 1);
@@ -82,6 +72,20 @@ namespace AdventOfCode2022
             if (this.IsInBounds(x, y - 1))
             {
                 yield return (x, y - 1);
+            }
+        }
+
+
+        public IEnumerable<(int x, int y)> GetAdjacentCoordinatesDiagonally(int x, int y)
+		{
+            if (this.IsInBounds(x - 1, y - 1))
+            {
+                yield return (x - 1, y - 1);
+            }
+
+            if (this.IsInBounds(x - 1, y + 1))
+            {
+                yield return (x - 1, y + 1);
             }
 
             if (this.IsInBounds(x + 1, y + 1))
@@ -93,9 +97,18 @@ namespace AdventOfCode2022
             {
                 yield return (x + 1, y - 1);
             }
+
+			foreach (var (x2, y2) in GetAdjacentCoordinates(x, y))
+			{
+				yield return (x2, y2);
+			}
         }
 
-		public bool IsInBounds(int x, int y) => x >= 0 && x < this.ColumnCount && y >= 0 && y < this.RowCount;
+		public bool IsInBoundsX(int x) => x >= 0 && x < this.ColumnCount;
+
+        public bool IsInBoundsY(int y) => y >= 0 && y < this.RowCount;
+
+		public bool IsInBounds(int x, int y) => this.IsInBoundsX(x) && this.IsInBoundsY(y);
 
 		public IEnumerable<T> GetColumn(int column)
 		{
@@ -157,14 +170,15 @@ namespace AdventOfCode2022
 
 	public static class Matrix
 	{
-		public static Matrix<F> InitWithStartValue<F>(int rows, int columns, F startValue)
+		public static Matrix<F> InitWithStartValue<F>(int rows, int columns, F startValue) => InitWithStartValue(rows, columns, () => startValue);
+		public static Matrix<F> InitWithStartValue<F>(int rows, int columns, Func<F> startValue)
 		{
 			var matrix = new F[columns, rows];
 			for (var c = 0; c < columns; c++)
 			{
 				for (var r = 0; r < rows; r++)
 				{
-					matrix[c, r] = startValue;
+					matrix[c, r] = startValue();
 				}
 			}
 

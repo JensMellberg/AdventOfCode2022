@@ -31,7 +31,7 @@ namespace AdventOfCode2022.TwentyThree
                     {
                         gears[x, y] = -gearId;
                     }
-                    foreach ((int aX, int aY) in matrix.GetAdjacentCoordinates(x, y))
+                    foreach ((int aX, int aY) in matrix.GetAdjacentCoordinatesDiagonally(x, y))
                     {
                         isPart[aX, aY] = true;
                         gears[aX, aY] = gearId;

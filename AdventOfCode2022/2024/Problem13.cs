@@ -15,7 +15,7 @@ namespace AdventOfCode2022.TwentyFour
         private const int ACost = 3;
         private const int BCost = 1;
         private const long CostAdjustment = 10000000000000;
-        protected override string Pattern => "¤_¤: X$¤x¤, Y$¤y¤";
+        protected override string Pattern => "[Button A|Button B|Prize]: X[+|=]¤x¤, Y[+|=]¤y¤";
 
         public override void Solve(IEnumerable<(long x, long y)> testInput)
         {
